@@ -1,0 +1,24 @@
+{{- if .Values.persistence.userData.enabled -}}
+---
+kind: "PersistentVolumeClaim"
+apiVersion: {{ .Values.apiVersions.persistentVolumeClaim | quote }}
+metadata:
+  name: {{ .Values.persistence.userData.pvcName | quote }}
+  namespace: {{ include "names.namespace" . | quote }}
+  labels:
+    {{- include "labels.commonLabels" . | nindent 4 }}
+  {{- with .Values.persistence.userData.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.userData.accessModes }}
+    - {{ . | quote}}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.userData.size | quote }}
+  storageClassName: {{ .Values.persistence.userData.storageClass | quote }}
+...
+{{- end }}

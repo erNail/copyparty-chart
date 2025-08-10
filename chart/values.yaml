@@ -1,0 +1,493 @@
+---
+# -- The api versions of the resources created by this chart.
+#
+# Ref: https://kubernetes.io/docs/reference/using-api/deprecation-guide/
+apiVersions:
+  deployment: "apps/v1"
+  horizontalPodAutoscaler: "autoscaling/v2"
+  ingress: "networking.k8s.io/v1"
+  networkPolicy: "networking.k8s.io/v1"
+  persistentVolumeClaim: "v1"
+  podDisruptionBudget: "policy/v1"
+  service: "v1"
+  serviceAccount: "v1"
+  serviceMonitor: "monitoring.coreos.com/v1"
+  configMap: "v1"
+  statefulSet: "apps/v1"
+
+# -- Use this to override the name of the chart.
+nameOverride: ""
+
+# -- Use this to override the fullname of the chart.
+fullnameOverride: ""
+
+# -- Use this to override the namespace of the chart.
+# By default, `.Release.Namespace` is used.
+namespaceOverride: ""
+
+# -- The number of replicas of the pod.
+# Will not be used if `.Values.autoscaling.enabled` is `true`.
+# Copyparte does not officially support running multiple replicas. Increase this value at your own risk.
+#
+# Ref: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# -- The image of the container.
+#
+# Ref: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  # -- The repository/name/url of the image.
+  repository: "copyparty/ac"
+  # -- The pull policy for the image.
+  pullPolicy: "Always"
+  # -- The tag of the image. If not set, the chart's `appVersion` is used.
+  tag: ""
+
+# -- Secrets for pulling an image from a private repository.
+#
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# -- Annotations to add to the pod(s).
+#
+# Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+
+# -- Extra labels to add to the pod(s).
+#
+# Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+extraPodLabels: {}
+
+# -- Resource limits and requests.
+#
+# Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+  # limits:
+  #   cpu: "100m"
+  #   memory: "128Mi"
+  #   ephemeral-storage: "128Mi"
+  # requests:
+  #   cpu: "100m"
+  #   memory: "128Mi"
+  #   ephemeral-storage: "128Mi"
+
+# -- The security context for the pod.
+#
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+podSecurityContext:
+  fsGroup: 10001
+
+# -- The security context for the container.
+#
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+containerSecurityContext:
+  readOnlyRootFilesystem: true
+  runAsUser: 10001
+  runAsGroup: 10001
+
+# -- The node selector for the pod(s).
+#
+# Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+nodeSelector: {}
+
+# -- The affinity for the pod(s).
+#
+# Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+affinity: {}
+
+# -- A host podAntiAffinity, that stops multiple pods from from being scheduled on the same node.
+#
+# Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+hostPodAntiAffinity:
+  # -- Whether to enable the host podAntiAffinity.
+  enabled: false
+  # -- The weight of the host podAntiAffinity.
+  weight: 50
+
+# -- The tolerations for the pod(s).
+#
+# Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations: {}
+
+# -- Liveness Probe configuration.
+# Liveness probes can be dangerous. Only use them if you really need one.
+# See https://srcco.de/posts/kubernetes-liveness-probes-are-dangerous.html for more information.
+#
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe: {}
+# httpGet:
+#   # -- The path to use for the liveness probe.
+#   path: "/live"
+#   # -- The port to use for the liveness probe.
+#   # This should reference the container ports defined at `.Values.containerPorts`.
+#   port: "http"
+
+# -- Readiness Probe configuration.
+#
+# Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+readinessProbe:
+  httpGet:
+    # -- The path to use for the readiness probe.
+    path: "/"
+    # -- The port to use for the readiness probe.
+    # This should reference the container ports defined at `.Values.containerPorts`.
+    port: "http"
+
+# -- Autoscaling configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Deployment strategy configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+strategy:
+  type: "RollingUpdate"
+
+# -- ConfigMap configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/configuration/configmap/
+configMap:
+  # -- Whether to create a ConfigMap resource.
+  enabled: false
+  # -- The name of the ConfigMap.
+  # The name should reference the ConfigMap name at `.Values.volumes`.
+  name: "copyparty-config"
+  # -- Annotations to add to the ConfigMap.
+  annotations: {}
+  # -- The data to add to the ConfigMap.
+  data: {}
+    # config.conf: |-
+    #   [global]
+    #     # The port to listen on
+    #     p: 3923
+    #     xff-src: lan
+    #     http-only
+    #     stats
+    #     e2dsa
+
+    #   [accounts]
+    #     metrics-admin: your-password
+    #     admin: your-password
+
+    #   [/]
+    #     .
+    #     accs:
+    #       rwda: admin
+    #       a: metrics-admin
+    #       rw: *
+
+# -- Persistent Volume Claim configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistence:
+  # -- Persistence configuration for the application data.
+  appData:
+    # -- Whether to enable persistence.
+    enabled: false
+    # -- The name of the persistent volume claim.
+    # The name should reference the PersistentVolumeClaim defined at `.Values.volumes`.
+    pvcName: "app-data"
+    # -- Annotations to add to the persistent volume claim.
+    annotations: {}
+    # -- The access modes of the persistent volume claim.
+    accessModes:
+      - "ReadWriteOnce"
+    # -- The size of the persistent volume claim.
+    size: "1Gi"
+    # -- The storage class of the persistent volume claim.
+    storageClass: ""
+  userData:
+    # -- Whether to enable persistence.
+    enabled: false
+    # -- The name of the persistent volume claim.
+    # The name should reference the PersistentVolumeClaim defined at `.Values.volumes`.
+    pvcName: "user-data"
+    # -- Annotations to add to the persistent volume claim.
+    annotations: {}
+    # -- The access modes of the persistent volume claim.
+    accessModes:
+      - "ReadWriteOnce"
+    # -- The size of the persistent volume claim.
+    size: "2Gi"
+    # -- The storage class of the persistent volume claim.
+    storageClass: ""
+
+# -- Volume Mounts configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+volumeMounts:
+  # -- The name should reference the volume defined at `.Values.volumes`.
+  # The mountPath should reference
+  - name: "app-data"
+    mountPath: ".config/copyparty"
+  # -- The name should reference the volume defined at `.Values.volumes`.
+  - name: "user-data"
+    mountPath: "/w"
+  # -- The name should reference the volume defined at `.Values.volumes`.
+  # -- The mountPath should reference the environment variable `XDG_CONFIG_HOME` defined at `.Values.app.env`.
+  - name: "copyparty-config"
+    mountPath: "/cfg"
+  # -- The name should reference the volume defined at `.Values.volumes`.
+  - name: "tmp"
+    mountPath: "/tmp"
+
+# -- Volumes configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+volumes:
+  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
+  # The PersistentVolumeClaim name should reference the PersistenVolumeClaim name
+  # at `.Values.persistence.appData.pvcName`.
+  - name: "app-data"
+    persistentVolumeClaim:
+      claimName: "app-data"
+  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
+  # The PersistentVolumeClaim name should reference the PersistenVolumeClaim name
+  # at `.Values.persistence.userData.pvcName`.
+  - name: "user-data"
+    persistentVolumeClaim:
+      claimName: "user-data"
+  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
+  # The copyparty config can contain sensitive information like passwords.
+  # You should provide a secret with the name set to the one below.
+  # The secret should contain a key `config.conf` with the copyparty configuration.
+  # Check `.Values.configMap.data` for an example configuration.
+  - name: "copyparty-config"
+    secret:
+      secretName: "copyparty-config"
+  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
+  - name: "tmp"
+    emptyDir: {}
+
+# -- Configuration for service accounts.
+#
+# Ref: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # -- Whether a service account should be created.
+  enabled: true
+  # -- Whether to mount a ServiceAccount's API credentials.
+  automount: true
+  # -- Annotations to add to the service account.
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set, a name is generated based on the chart name.
+  name: ""
+
+# -- The ports of the container.
+# To use these ports in the service(s),
+# you need to add them to `.Values.service.ports` or `.Values.metrics.service.ports`.
+#
+# If `.Values.networkPolicy.enabled` is true and `.Values.ingress.enabled` is true,
+# you need to add them to `.Values.networkPolicy.ingressController.containerPorts`.
+#
+# If `.Values.livenessProbe.enabled` is true, you need to add them to `.Values.livenessProbe`.
+#
+# If `.Values.readinessProbe.enabled` is true, you need to add them to `.Values.readinessProbe`.
+#
+# Ref: https://kubernetes.io/docs/concepts/services-networking/service/
+#
+# Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+containerPorts:
+  - name: "http"
+    port: 3923
+    protocol: "TCP"
+  - name: "metrics"
+    port: 3923
+    protocol: "TCP"
+
+# -- Service configuration.
+# A service for metrics is created separately. Check `.Values.metrics` for more information.
+#
+# Ref: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # -- The type of service to create.
+  #
+  # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: "ClusterIP"
+  # -- The ports of the service.
+  # These should reference the container ports defined at `.Values.containerPorts`.
+  # When `.Values.ingress.enabled` is `true`, they should reference `.Values.ingress.hosts`.
+  #
+  # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  ports:
+    - name: "http"
+      port: 80
+      protocol: "TCP"
+      targetPort: "http"
+  # -- Wether to create an additional headless service.
+  # This should be enabled when using StatefulSets.
+  #
+  # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
+  enableAdditionalHeadlessService: false
+
+# -- Configuration options regarding metrics resources (ServiceMonitor, Service, etc.).
+#
+# Ref: https://github.com/prometheus-operator/prometheus-operator?tab=readme-ov-file#customresourcedefinitions
+metrics:
+  # -- Whether to create a service for metrics.
+  # Be aware that the metrics can only be fetched by a user with `admin` access.
+  # You need to configure copyparty so a admin user exists that will be used for fetching metrics.
+  enabled: false
+  # -- Metrics service configuration.
+  service:
+    # -- The type of service to create.
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    type: "ClusterIP"
+    # -- The ports of the metrics service.
+    # These should reference the container ports defined at `.Values.containerPorts`.
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+    ports:
+      - name: "metrics"
+        port: 3000
+        protocol: "TCP"
+        targetPort: "metrics"
+  # -- ServiceMonitor configuration.
+  #
+  # Ref: https://github.com/prometheus-operator/prometheus-operator?tab=readme-ov-file#customresourcedefinitions
+  serviceMonitor:
+    # -- Whether to create a ServiceMonitor resource.
+    # Be aware that the metrics can only be fetched by a user with `admin` access.
+    # You need to configure copyparty so a admin user exists that is used by the ServiceMonitor.
+    enabled: false
+    # -- Configuration of the endpoints to scrape.
+    # Any list of endpoints matching the `ServiceMonitor.spec.endpoints` spec is valid.
+    #
+    # Ref: https://docs.okd.io/latest/rest_api/monitoring_apis/servicemonitor-monitoring-coreos-com-v1.html
+    endpoints:
+      # -- The service port to scrape.
+      # This should reference the service ports defined at `.Values.metrics.service.ports`.
+      - port: "metrics"
+        # -- The interval at which metrics should be scraped.
+        interval: "30s"
+        # -- The metric relabelings to apply.
+        metricRelabelings: []
+        # -- The relabelings to apply.
+        relabelings: []
+        # -- The path to scrape metrics from.
+        path: "/.cpr/metrics"
+        # # -- The basic auth credentials to use for scraping metrics.
+        # basicAuth:
+        #   username:
+        #     name: "copyparty-metrics-admin-credentials"
+        #     key: "username"
+        #     optional: false
+        #   password:
+        #     name: "copyparty-metrics-admin-credentials"
+        #     key: "password"
+        #     optional: false
+
+
+# -- Ingress configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  # -- Whether to create an Ingress resource.
+  enabled: false
+  # -- Annotations to add to the Ingress.
+  annotations: {}
+    # kubernetes.io/ingress.class: "nginx"
+    # cert-manager.io/cluster-issuer: "dns01-cloudflare-cluster-issuer-prod"
+  # -- The class of the Ingress controller.
+  className: "nginx"
+  # -- The hosts of the Ingress.
+  hosts:
+    - host: "copyparty.example.com"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+          # -- The service port name to use for the Ingress.
+          # This should reference the service ports defined at `.Values.service.ports`.
+          servicePortName: "http"
+  # -- The TLS configuration for the Ingress.
+  tls:
+    - hosts:
+        - "copyparty.example.com"
+      secretName: "app-tls"
+
+# -- Network Policy configuration.
+#
+# Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+networkPolicy:
+  # -- Whether to create a NetworkPolicy resource.
+  enabled: false
+  # -- Annotations to add to the NetworkPolicy.
+  annotations: {}
+  # -- Egress configuration.
+  egress:
+    # -- Whether to allow all egress traffic.
+    # If true, all other egress rules will be ignored.
+    allowAll: false
+    # -- Extra egress rules.
+    extraRules: []
+  ingress:
+    # -- Whether to allow all ingress traffic.
+    # If true, all other ingress rules will be ignored.
+    allowAll: false
+    # -- Extra ingress rules.
+    extraRules: []
+    # -- Configuration for allowing ingress traffic from the ingress controller.
+    # Only used if `ingress.enabled` is true.
+    ingressController:
+      # -- The container ports to allow the ingress controller to access.
+      # These should reference the container ports defined at `.Values.containerPorts`.
+      containerPorts:
+        - "http"
+      # -- The `from` rules to allow ingress traffic from the ingress controller.
+      from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "ingress"
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: "ingress-nginx"
+    # -- Configuration for allowing ingress traffic from the metrics scraper.
+    metricsScraper:
+      # -- The `from` rules to allow ingress traffic from the metrics scraper(s).
+      from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "kube-prometheus-stack"
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: "kube-prometheus-stack-prometheus-operator"
+  # -- Extra ingress rules.
+  extraIngess: []
+
+# -- Pod Disruption Budget configuration.
+#
+# Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  # -- Whether to create a PodDisruptionBudget resource.
+  enabled: false
+  # -- Annotations to add to the PodDisruptionBudget.
+  annotations: {}
+  # -- The minimum number of pods that must be available. If set, maxUnavailable won't be used.
+  minAvailable: 1
+  # -- The maximum number of pods that can be unavailable. Ignored if `minAvailable` is set.
+  maxUnavailable: 1
+  # -- The Unhealthy Pod Eviction Policy.
+  unhealthyPodEvictionPolicy: "AlwaysAllow"
+
+# -- App configuration.
+app:
+  # -- Environment variables to pass to the container.
+  # You can use valueFrom to reference secrets or configMaps.
+  #
+  # Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+  env:
+    - name: "XDG_CONFIG_HOME"
+      value: "/cfg"
+  # -- Arguments to pass to the containers entrypoint.
+  #
+  # Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  args:
+    - "--stats"
+...

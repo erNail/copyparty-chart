@@ -1,0 +1,45 @@
+---
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: "256m"
+    memory: "256Mi"
+    ephemeral-storage: "256Mi"
+  limits:
+    cpu: "256Mi"
+    memory: "256Mi"
+    ephemeral-storage: "256Mi"
+
+autoscaling:
+  enabled: true
+
+persistence:
+  appData:
+    enabled: true
+  userData":
+    enabled: true
+
+ingress:
+  enabled: true
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+podDisruptionBudget:
+  enabled: true
+
+hostPodAntiAffinity:
+  enabled: true
+
+networkPolicy:
+  enabled: true
+
+serviceAccount:
+  enabled: true
+
+service:
+  enableAdditionalHeadlessService: true
+...
