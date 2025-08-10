@@ -1,0 +1,26 @@
+---
+apiVersion: "v2"
+name: "copyparty"
+description: "A lightweight Helm chart for copyparty that prioritizes transparency and flexibility"
+type: "application"
+icon: "https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg"
+keywords:
+  - "copyparty"
+  - "file-sharing"
+  - "file-server"
+  - "webdav-server"
+maintainers:
+  - name: "ernail"
+    email: "nagel.eric.95@googlemail.com"
+annotations:
+  artifacthub.io/license: "MIT"
+  artifacthub.io/links: |
+    - name: source
+      url: https://github.com/erNail/copyparty-chart
+    - name: support
+      url: https://github.com/erNail/copyparty-chart/issues
+version: "0.0.0"
+
+# renovate: image=copyparty/ac
+appVersion: "1.18.9"
+...

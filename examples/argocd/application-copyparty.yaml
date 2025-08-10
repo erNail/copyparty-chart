@@ -1,0 +1,30 @@
+---
+apiVersion: "argoproj.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: "copyparty"
+  namespace: "argocd"
+spec:
+  project: "default"
+  sources:
+    - repoURL: "https://github.com/erNail/copyparty-chart"
+      targetRevision: "main"
+      path: "examples/argocd"
+      ref: "values"
+    - repoURL: "https://github.com/erNail/copyparty-chart"
+      targetRevision: "main"
+      path: "chart"
+      helm:
+        releaseName: "copyparty"
+        valueFiles:
+          - "$values/examples/argocd/values-copyparty.yaml"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: "copyparty"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - "CreateNamespace=true"
+...

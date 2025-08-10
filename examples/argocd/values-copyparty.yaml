@@ -1,0 +1,56 @@
+---
+resources:
+  requests:
+    cpu: "256m"
+    memory: "256Mi"
+    ephemeral-storage: "256Mi"
+  limits:
+    memory: "256Mi"
+    ephemeral-storage: "256Mi"
+
+persistence:
+  appData:
+    enabled: true
+    size: "1Gi"
+    storageClass: "longhorn"
+  userData:
+    enabled: true
+    size: "2Gi"
+    storageClass: "longhorn"
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    endpoints:
+      - port: "metrics"
+        interval: "30s"
+        path: "/.cpr/metrics"
+        basicAuth:
+          username:
+            name: "copyparty-metrics-admin-credentials"
+            key: "username"
+            optional: false
+          password:
+            name: "copyparty-metrics-admin-credentials"
+            key: "password"
+            optional: false
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "dns01-cloudflare-cluster-issuer-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+  hosts:
+    - host: "copyparty.nailforge.dev"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+          servicePortName: "http"
+  tls:
+    - hosts:
+        - "copyparty.nailforge.dev"
+      secretName: "copyparty-tls"
+...

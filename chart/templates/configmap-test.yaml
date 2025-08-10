@@ -1,0 +1,81 @@
+---
+suite: "configmap template"
+templates:
+  - "configmap.yaml"
+tests:
+  - it: "should not render ConfigMap when disabled"
+    set:
+      configMap:
+        enabled: false
+    asserts:
+      - notExists:
+          path: "data"
+
+  - it: "should render ConfigMap when enabled"
+    set:
+      configMap:
+        enabled: true
+        data:
+          my-key: "my-value"
+          another-key: |
+            multi-line
+            value
+    asserts:
+      - isKind:
+          of: "ConfigMap"
+
+  - it: "should render apiVersion with default value"
+    set:
+      configMap:
+        enabled: true
+    asserts:
+      - equal:
+          path: "apiVersion"
+          value: "v1"
+
+  - it: "should render apiVersion as set"
+    set:
+      configMap:
+        enabled: true
+      apiVersions:
+        configMap: "v2"
+    asserts:
+      - equal:
+          path: "apiVersion"
+          value: "v2"
+
+  - it: "should render annotations if set"
+    set:
+      configMap:
+        enabled: true
+        annotations:
+          foo: "bar"
+    asserts:
+      - equal:
+          path: metadata.annotations.foo
+          value: bar
+
+  - it: "should not render data with default values"
+    set:
+      configMap:
+        enabled: true
+    asserts:
+      - equal:
+          path: "data"
+          value: null
+
+  - it: "should render data as set"
+    set:
+      configMap:
+        enabled: true
+        data:
+          key1: value1
+          key2: value2
+    asserts:
+      - equal:
+          path: "data"
+          value:
+            key1: |
+              value1
+            key2: |
+              value2
