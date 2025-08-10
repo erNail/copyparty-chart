@@ -1,0 +1,5 @@
+dist/
+
+# Secrets
+secret-*
+!sealed-secret*
