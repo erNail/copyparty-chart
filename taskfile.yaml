@@ -4,7 +4,17 @@ version: "3"
 tasks:
   install:
     cmds:
-      - "brew install helm helmfile kube-score kube-linter yamllint pre-commit norwoodj/tap/helm-docs"
+      - >
+        brew install
+        helm
+        helmfile
+        kube-score
+        kube-linter
+        yamllint
+        prettier
+        trufflehog
+        markdownlint-cli
+        actionlint
       - "helm plugin install https://github.com/helm-unittest/helm-unittest.git"
 
   render:
@@ -18,16 +28,21 @@ tasks:
     deps:
       - "render"
     cmds:
+      - "prettier --write ."
+      - "markdownlint '**/*.md'"
+      - "yamllint ."
+      - "yamllint -c .yamllint-manifests.yaml ."
       - "kube-score score chart/dist/copyparty/templates/*.yaml"
       - "kube-linter lint chart/dist/copyparty/templates/*.yaml"
-      - "yamllint -c .yamllint-manifests.yaml chart/dist/copyparty/templates/*.yaml"
-      - "pre-commit run --all-files"
+      - "trufflehog git file://."
 
   test:
     cmds:
       - "helm unittest -f 'templates/*-test.yaml' ./chart"
 
-  docs:
+  build:
     cmds:
-      - "helm-docs"
-...
+      - "cp ./README.md ./chart/README.md"
+      - >
+        helm package chart
+        --version "0.0.0"

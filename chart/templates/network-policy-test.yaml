@@ -81,10 +81,10 @@ tests:
           path: "spec.egress"
           value:
             - ports:
-              - port: 53
-                protocol: "TCP"
-              - port: 53
-                protocol: "UDP"
+                - port: 53
+                  protocol: "TCP"
+                - port: 53
+                  protocol: "UDP"
 
   - it: "should render extra egress rules as set"
     set:
@@ -100,10 +100,10 @@ tests:
           path: "spec.egress"
           value:
             - ports:
-              - port: 53
-                protocol: "TCP"
-              - port: 53
-                protocol: "UDP"
+                - port: 53
+                  protocol: "TCP"
+                - port: 53
+                  protocol: "UDP"
             - ports:
                 - port: 80
                   protocol: "TCP"
@@ -262,6 +262,5 @@ tests:
           path: "spec.ingress"
           value:
             - ports:
-              - port: 8080
-                protocol: "TCP"
-...
+                - port: 8080
+                  protocol: "TCP"

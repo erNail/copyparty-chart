@@ -331,10 +331,19 @@ tests:
               path: "/healthz"
               port: "http"
 
-  - it: "should not render resources with default value"
+  - it: "should render resources with default value"
     asserts:
-      - notExists:
+      - equal:
           path: "spec.template.spec.containers[0].resources"
+          value:
+            limits:
+              cpu: "100m"
+              ephemeral-storage: "128Mi"
+              memory: "128Mi"
+            requests:
+              cpu: "100m"
+              ephemeral-storage: "128Mi"
+              memory: "128Mi"
 
   - it: "should render resources as set"
     set:
@@ -434,7 +443,7 @@ tests:
       - equal:
           path: "spec.template.spec.nodeSelector"
           value:
-              disktype: "ssd"
+            disktype: "ssd"
 
   - it: "should not render affinity with default value"
     asserts:
@@ -470,11 +479,11 @@ tests:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/os
-                operator: In
-                values:
-                - linux
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
     asserts:
       - equal:
           path: "spec.template.spec.affinity"
@@ -482,11 +491,11 @@ tests:
             nodeAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 nodeSelectorTerms:
-                - matchExpressions:
-                  - key: kubernetes.io/os
-                    operator: In
-                    values:
-                    - linux
+                  - matchExpressions:
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                          - linux
 
   - it: "should not render tolerations with default value"
     asserts:
@@ -508,4 +517,3 @@ tests:
               operator: "Equal"
               value: "value"
               effect: "NoSchedule"
-...

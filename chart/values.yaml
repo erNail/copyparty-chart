@@ -27,7 +27,7 @@ namespaceOverride: ""
 
 # -- The number of replicas of the pod.
 # Will not be used if `.Values.autoscaling.enabled` is `true`.
-# Copyparte does not officially support running multiple replicas. Increase this value at your own risk.
+# Copyparty does not support running multiple replicas. Increase this at your own risk.
 #
 # Ref: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
@@ -61,15 +61,15 @@ extraPodLabels: {}
 # -- Resource limits and requests.
 #
 # Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-resources: {}
-  # limits:
-  #   cpu: "100m"
-  #   memory: "128Mi"
-  #   ephemeral-storage: "128Mi"
-  # requests:
-  #   cpu: "100m"
-  #   memory: "128Mi"
-  #   ephemeral-storage: "128Mi"
+resources:
+  limits:
+    cpu: "100m"
+    memory: "128Mi"
+    ephemeral-storage: "128Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+    ephemeral-storage: "128Mi"
 
 # -- The security context for the pod.
 #
@@ -134,6 +134,7 @@ readinessProbe:
     port: "http"
 
 # -- Autoscaling configuration.
+# Copyparty does not support running multiple replicas. Enable this at your own risk.
 #
 # Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
@@ -384,7 +385,6 @@ metrics:
         #     key: "password"
         #     optional: false
 
-
 # -- Ingress configuration.
 #
 # Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -490,4 +490,3 @@ app:
   # Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
   args:
     - "--stats"
-...
