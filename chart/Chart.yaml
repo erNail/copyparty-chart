@@ -22,5 +22,5 @@ annotations:
 version: "0.0.0"
 
 # renovate: image=copyparty/ac
-appVersion: "1.18.9"
+appVersion: "1.19.20"
 ...
