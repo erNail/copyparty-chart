@@ -53,4 +53,3 @@ ingress:
     - hosts:
         - "copyparty.nailforge.dev"
       secretName: "copyparty-tls"
-...

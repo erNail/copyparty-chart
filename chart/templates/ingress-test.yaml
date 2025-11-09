@@ -162,4 +162,3 @@ tests:
                         name: "copyparty"
                         port:
                           name: "custom-service-port"
-...

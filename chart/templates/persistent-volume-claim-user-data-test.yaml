@@ -152,4 +152,3 @@ tests:
       - equal:
           path: "spec.storageClassName"
           value: "standard"
-...
