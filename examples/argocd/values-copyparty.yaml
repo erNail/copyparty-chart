@@ -8,15 +8,17 @@ resources:
     memory: "256Mi"
     ephemeral-storage: "256Mi"
 
-persistence:
+volumeConfig:
   appData:
-    enabled: true
-    size: "1Gi"
-    storageClass: "longhorn"
+    persistence:
+      enabled: true
+      size: "1Gi"
+      storageClass: "longhorn"
   userData:
-    enabled: true
-    size: "2Gi"
-    storageClass: "longhorn"
+    persistence:
+      enabled: true
+      size: "2Gi"
+      storageClass: "longhorn"
 
 metrics:
   enabled: true

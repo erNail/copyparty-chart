@@ -4,11 +4,13 @@ replicaCount: 2
 autoscaling:
   enabled: true
 
-persistence:
+volumeConfig:
   appData:
-    enabled: true
-  userData":
-    enabled: true
+    persistence:
+      enabled: true
+  userData:
+    persistence:
+      enabled: true
 
 ingress:
   enabled: true
