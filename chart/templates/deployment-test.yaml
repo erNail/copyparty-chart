@@ -40,12 +40,10 @@ tests:
           path: "spec.replicas"
 
   - it: "should render default replicaCount"
-    set:
-      replicaCount: 2
     asserts:
       - equal:
           path: "spec.replicas"
-          value: 2
+          value: 1
 
   - it: "should render set replicaCount"
     set:
@@ -98,11 +96,11 @@ tests:
       - equal:
           path: "spec.template.metadata.labels"
           value:
-            app.kubernetes.io/instance: copyparty
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: copyparty
-            app.kubernetes.io/version: 0.0.0
-            helm.sh/chart: copyparty-0.0.0
+            app.kubernetes.io/instance: "copyparty"
+            app.kubernetes.io/managed-by: "Helm"
+            app.kubernetes.io/name: "copyparty"
+            app.kubernetes.io/version: "0.0.0"
+            helm.sh/chart: "copyparty-0.0.0"
 
   - it: "should render extraPodLabels as set"
     chart:
@@ -116,12 +114,12 @@ tests:
       - equal:
           path: "spec.template.metadata.labels"
           value:
-            app.kubernetes.io/instance: copyparty
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: copyparty
-            app.kubernetes.io/version: 0.0.0
-            helm.sh/chart: copyparty-0.0.0
-            test: test
+            app.kubernetes.io/instance: "copyparty"
+            app.kubernetes.io/managed-by: "Helm"
+            app.kubernetes.io/name: "copyparty"
+            app.kubernetes.io/version: "0.0.0"
+            helm.sh/chart: "copyparty-0.0.0"
+            test: "test"
 
   - it: "should not render imagePullSecrets with default value"
     asserts:
@@ -140,7 +138,7 @@ tests:
 
   - it: "should render podSecurityContext with default value"
     asserts:
-      - exists:
+      - equal:
           path: "spec.template.spec.securityContext"
           value:
             fsGroup: 10001
@@ -156,6 +154,7 @@ tests:
           value:
             fsGroup: 1000
             runAsUser: 1000
+
   - it: "should render container name as Chart.Name"
     asserts:
       - equal:
@@ -164,7 +163,7 @@ tests:
 
   - it: "should render container env with default value"
     asserts:
-      - exists:
+      - equal:
           path: "spec.template.spec.containers[0].env"
           value:
             - name: "XDG_CONFIG_HOME"
@@ -262,11 +261,11 @@ tests:
       - equal:
           path: "spec.template.spec.containers[0].ports"
           value:
-            - name: "http"
-              containerPort: 3923
+            - containerPort: 3923
+              name: "http"
               protocol: "TCP"
-            - name: "metrics"
-              containerPort: 3923
+            - containerPort: 3923
+              name: "metrics"
               protocol: "TCP"
 
   - it: "should render container ports as set"
@@ -375,13 +374,13 @@ tests:
           path: "spec.template.spec.containers[0].volumeMounts"
           value:
             - mountPath: ".config/copyparty"
-              name: app-data
-            - mountPath: /w
-              name: user-data
-            - mountPath: /cfg
-              name: copyparty-config
-            - mountPath: /tmp
-              name: tmp
+              name: "app-data"
+            - mountPath: "/cfg"
+              name: "copyparty-config"
+            - mountPath: "/tmp"
+              name: "tmp"
+            - mountPath: "/w"
+              name: "user-data"
 
   - it: "should render volumeMounts as set"
     set:
@@ -467,8 +466,8 @@ tests:
                   podAffinityTerm:
                     labelSelector:
                       matchLabels:
-                        app.kubernetes.io/instance: copyparty
-                        app.kubernetes.io/name: copyparty
+                        app.kubernetes.io/instance: "copyparty"
+                        app.kubernetes.io/name: "copyparty"
                     topologyKey: "kubernetes.io/hostname"
 
   - it: "should render affinity as set"
@@ -480,10 +479,10 @@ tests:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: kubernetes.io/os
-                    operator: In
+                  - key: "kubernetes.io/os"
+                    operator: "In"
                     values:
-                      - linux
+                      - "linux"
     asserts:
       - equal:
           path: "spec.template.spec.affinity"
@@ -492,10 +491,10 @@ tests:
               requiredDuringSchedulingIgnoredDuringExecution:
                 nodeSelectorTerms:
                   - matchExpressions:
-                      - key: kubernetes.io/os
-                        operator: In
+                      - key: "kubernetes.io/os"
+                        operator: "In"
                         values:
-                          - linux
+                          - "linux"
 
   - it: "should not render tolerations with default value"
     asserts:

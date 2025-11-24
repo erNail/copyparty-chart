@@ -100,15 +100,15 @@ tests:
               port: "custom-metrics"
               path: "/custom-metrics"
               metricRelabelings:
-                - sourceLabels: [__name__]
-                  action: keep
+                - sourceLabels: ["__name__"]
+                  action: "keep"
                   regex: "up"
     asserts:
       - equal:
           path: "spec.endpoints[0].metricRelabelings"
           value:
-            - sourceLabels: [__name__]
-              action: keep
+            - sourceLabels: ["__name__"]
+              action: "keep"
               regex: "up"
 
   - it: "should render relabelings as set"
@@ -122,13 +122,13 @@ tests:
               port: "custom-metrics"
               path: "/custom-metrics"
               relabelings:
-                - sourceLabels: [__name__]
-                  action: keep
+                - sourceLabels: ["__name__"]
+                  action: "keep"
                   regex: "up"
     asserts:
       - equal:
           path: "spec.endpoints[0].relabelings"
           value:
-            - sourceLabels: [__name__]
-              action: keep
+            - sourceLabels: ["__name__"]
+              action: "keep"
               regex: "up"
