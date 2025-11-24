@@ -1,24 +1,24 @@
-{{- if .Values.persistence.appData.enabled -}}
+{{- if .Values.volumeConfig.appData.persistence.enabled -}}
 ---
 kind: "PersistentVolumeClaim"
 apiVersion: {{ .Values.apiVersions.persistentVolumeClaim | quote }}
 metadata:
-  name: {{ .Values.persistence.appData.pvcName | quote }}
+  name: {{ .Values.volumeConfig.appData.persistence.pvcName | quote }}
   namespace: {{ include "names.namespace" . | quote }}
   labels:
     {{- include "labels.commonLabels" . | nindent 4 }}
-  {{- with .Values.persistence.appData.annotations }}
+  {{- with .Values.volumeConfig.appData.persistence.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
-  {{- range .Values.persistence.appData.accessModes }}
+  {{- range .Values.volumeConfig.appData.persistence.accessModes }}
     - {{ . | quote}}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.appData.size | quote }}
-  storageClassName: {{ .Values.persistence.appData.storageClass | quote }}
+      storage: {{ .Values.volumeConfig.appData.persistence.size | quote }}
+  storageClassName: {{ .Values.volumeConfig.appData.persistence.storageClass | quote }}
 ...
 {{- end }}

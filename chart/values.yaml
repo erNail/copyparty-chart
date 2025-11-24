@@ -58,6 +58,7 @@ podAnnotations: {}
 extraPodLabels: {}
 
 # -- Resource limits and requests.
+# You might want to set `limits.cpu` to `null`: https://home.robusta.dev/blog/stop-using-cpu-limits
 #
 # Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 resources:
@@ -182,88 +183,75 @@ configMap:
     #       a: metrics-admin
     #       rw: *
 
-# -- Persistent Volume Claim configuration.
+# -- Configures the pods `volumes` and `volumeMounts`, as well as the Persistent Volume Claims
 #
-# Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
-persistence:
-  # -- Persistence configuration for the application data.
+# Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+volumeConfig:
   appData:
-    # -- Whether to enable persistence.
-    enabled: false
-    # -- The name of the persistent volume claim.
-    # The name should reference the PersistentVolumeClaim defined at `.Values.volumes`.
-    pvcName: "app-data"
-    # -- Annotations to add to the persistent volume claim.
-    annotations: {}
-    # -- The access modes of the persistent volume claim.
-    accessModes:
-      - "ReadWriteOnce"
-    # -- The size of the persistent volume claim.
-    size: "1Gi"
-    # -- The storage class of the persistent volume claim.
-    storageClass: ""
+    # -- Will be added to the pods `volumeMounts`.
+    volumeMount:
+      name: "app-data"
+      mountPath: ".config/copyparty"
+    # -- Will be added to the pods `volumes` if `persistence.enabled` is `false`.
+    volume:
+      name: "app-data"
+      emptyDir: {}
+    # -- Persistent Volume Claim configuration
+    persistence:
+      enabled: false
+      pvcName: "app-data"
+      annotations: {}
+      accessModes:
+        - "ReadWriteOnce"
+      size: "1Gi"
+      storageClass: ""
+      # -- Will be added to the pods `volumes` if `persistence.enabled` is `true`.
+      volume:
+        name: "app-data"
+        persistentVolumeClaim:
+          claimName: "app-data"
   userData:
-    # -- Whether to enable persistence.
-    enabled: false
-    # -- The name of the persistent volume claim.
-    # The name should reference the PersistentVolumeClaim defined at `.Values.volumes`.
-    pvcName: "user-data"
-    # -- Annotations to add to the persistent volume claim.
-    annotations: {}
-    # -- The access modes of the persistent volume claim.
-    accessModes:
-      - "ReadWriteOnce"
-    # -- The size of the persistent volume claim.
-    size: "2Gi"
-    # -- The storage class of the persistent volume claim.
-    storageClass: ""
-
-# -- Volume Mounts configuration.
-#
-# Ref: https://kubernetes.io/docs/concepts/storage/volumes/
-volumeMounts:
-  # -- The name should reference the volume defined at `.Values.volumes`.
-  # The mountPath should reference
-  - name: "app-data"
-    mountPath: ".config/copyparty"
-  # -- The name should reference the volume defined at `.Values.volumes`.
-  - name: "user-data"
-    mountPath: "/w"
-  # -- The name should reference the volume defined at `.Values.volumes`.
-  # -- The mountPath should reference the environment variable `XDG_CONFIG_HOME` defined at `.Values.app.env`.
-  - name: "copyparty-config"
-    mountPath: "/cfg"
-  # -- The name should reference the volume defined at `.Values.volumes`.
-  - name: "tmp"
-    mountPath: "/tmp"
-
-# -- Volumes configuration.
-#
-# Ref: https://kubernetes.io/docs/concepts/storage/volumes/
-volumes:
-  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
-  # The PersistentVolumeClaim name should reference the PersistenVolumeClaim name
-  # at `.Values.persistence.appData.pvcName`.
-  - name: "app-data"
-    persistentVolumeClaim:
-      claimName: "app-data"
-  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
-  # The PersistentVolumeClaim name should reference the PersistenVolumeClaim name
-  # at `.Values.persistence.userData.pvcName`.
-  - name: "user-data"
-    persistentVolumeClaim:
-      claimName: "user-data"
-  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
-  # The copyparty config can contain sensitive information like passwords.
-  # You should provide a secret with the name set to the one below.
-  # The secret should contain a key `config.conf` with the copyparty configuration.
-  # Check `.Values.configMap.data` for an example configuration.
-  - name: "copyparty-config"
-    secret:
-      secretName: "copyparty-config"
-  # -- The volume name should reference the volumeMounts defined at `.Values.volumeMounts`.
-  - name: "tmp"
-    emptyDir: {}
+    # -- Will be added to the pods `volumeMounts`.
+    volumeMount:
+      name: "user-data"
+      mountPath: "/w"
+    # -- Will be added to the pods `volumes` if `persistence.enabled` is `false`.
+    volume:
+      name: "user-data"
+      emptyDir: {}
+    # -- Persistent Volume Claim configuration
+    persistence:
+      enabled: false
+      pvcName: "user-data"
+      annotations: {}
+      accessModes:
+        - "ReadWriteOnce"
+      size: "1Gi"
+      storageClass: ""
+      # -- Will be added to the pods `volumes` if `persistence.enabled` is `true`.
+      volume:
+        name: "user-data"
+        persistentVolumeClaim:
+          claimName: "user-data"
+  copypartyConfig:
+    # -- Will be added to the pods `volumeMounts`.
+    volumeMount:
+      name: "copyparty-config"
+      mountPath: "/cfg"
+    # -- Will be added to the pods `volumes`.
+    volume:
+      name: "copyparty-config"
+      secret:
+        secretName: "copyparty-config"
+  tmp:
+    # -- Will be added to the pods `volumeMounts`.
+    volumeMount:
+      name: "tmp"
+      mountPath: "/tmp"
+    # -- Will be added to the pods `volumes`.
+    volume:
+      name: "tmp"
+      emptyDir: {}
 
 # -- Configuration for service accounts.
 #

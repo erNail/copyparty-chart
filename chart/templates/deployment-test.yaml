@@ -384,10 +384,16 @@ tests:
 
   - it: "should render volumeMounts as set"
     set:
-      volumeMounts:
-        - name: "foo"
-          mountPath: "/etc/foo"
-          readOnly: true
+      volumeConfig:
+        appData: null
+        userData: null
+        tmp: null
+        copypartyConfig: null
+        foo:
+          volumeMount:
+            name: "foo"
+            mountPath: "/etc/foo"
+            readOnly: true
     asserts:
       - equal:
           path: "spec.template.spec.containers[0].volumeMounts"
@@ -396,30 +402,38 @@ tests:
               mountPath: "/etc/foo"
               readOnly: true
 
-  - it: "should render volumes with default value"
+  - it: "should render non-persistence volumes with default value"
     asserts:
       - equal:
           path: "spec.template.spec.volumes"
           value:
-            - name: app-data
-              persistentVolumeClaim:
-                claimName: app-data
-            - name: user-data
-              persistentVolumeClaim:
-                claimName: user-data
-            - secret:
-                secretName: copyparty-config
-              name: copyparty-config
             - emptyDir: {}
-              name: tmp
+              name: "app-data"
+            - name: "copyparty-config"
+              secret:
+                secretName: "copyparty-config"
+            - emptyDir: {}
+              name: "tmp"
+            - emptyDir: {}
+              name: "user-data"
 
-  - it: "should render volumes as set"
+  - it: "should render non-persistence volumes as set"
     set:
-      volumes:
-        - name: "foo"
-          secret:
-            secretName: "mysecret"
-            optional: false
+      volumeConfig:
+        appData: null
+        userData: null
+        tmp: null
+        copypartyConfig: null
+        foo:
+          volume:
+            name: "foo"
+            secret:
+              secretName: "mysecret"
+              optional: false
+          persistence:
+            enabled: false
+            volume:
+              name: "should-not-be-used"
     asserts:
       - equal:
           path: "spec.template.spec.volumes"
@@ -428,6 +442,55 @@ tests:
               secret:
                 secretName: "mysecret"
                 optional: false
+
+  - it: "should render persistence volumes with default value"
+    set:
+      volumeConfig:
+        appData:
+          persistence:
+            enabled: true
+        userData:
+          persistence:
+            enabled: true
+    asserts:
+      - equal:
+          path: "spec.template.spec.volumes"
+          value:
+            - name: "app-data"
+              persistentVolumeClaim:
+                claimName: "app-data"
+            - name: "copyparty-config"
+              secret:
+                secretName: "copyparty-config"
+            - emptyDir: {}
+              name: "tmp"
+            - name: "user-data"
+              persistentVolumeClaim:
+                claimName: "user-data"
+
+  - it: "should render persistence volumes as set"
+    set:
+      volumeConfig:
+        appData: null
+        userData: null
+        tmp: null
+        copypartyConfig: null
+        foo:
+          volume:
+            name: "should-not-be-used"
+          persistence:
+            enabled: true
+            volume:
+              name: "foo-persistent-volume"
+              persistentVolumeClaim:
+                claimName: "foo-pvc"
+    asserts:
+      - equal:
+          path: "spec.template.spec.volumes"
+          value:
+            - name: "foo-persistent-volume"
+              persistentVolumeClaim:
+                claimName: "foo-pvc"
 
   - it: "should not render nodeSelector with default value"
     asserts:
