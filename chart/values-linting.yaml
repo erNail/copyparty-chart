@@ -27,8 +27,5 @@ hostPodAntiAffinity:
 serviceAccount:
   enabled: true
 
-configMap:
-  enabled: true
-
 service:
   enableAdditionalHeadlessService: true
