@@ -24,9 +24,6 @@ podDisruptionBudget:
 hostPodAntiAffinity:
   enabled: true
 
-networkPolicy:
-  enabled: true
-
 serviceAccount:
   enabled: true
 
