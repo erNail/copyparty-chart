@@ -10,21 +10,31 @@ Tested with [`helm-unittest`](https://github.com/helm-unittest/helm-unittest).
 
 ## Design Philosophy
 
-### Transparency and Flexibility over Abstraction and Convenience
+### No Magic
 
 This chart may diverge from some common chart conventions.
-It favors transparency and flexibility over abstraction and convenience:
+The goal is to provide a chart that is configurable and understandable.
+To achieve this, hidden logic and magic behavior is avoided as much as possible.
+But this comes at the cost of convenience:
+For example, if you want to change the ports the application is using, you'd have to adapt both
+`.Values.containerPorts` and whatever fields are configuring the application
+(environment variables at `.Values.app.env` or arguments at `.Values.app.args`,
+or config files at `.Values.configMap.data`).
 
-- **Values-Driven:** The goal is to provide a chart that can be understood just by looking at the values file.
-  There should be no need to look into the templates to understand what the chart does and how it works.
-- **Minimal Abstraction:** The chart avoids hidden logic and magic behavior as much as possible.
-  A lot of what you see in the values file is what gets rendered in the templates.
-- **Flexibility over Convenience:** The chart is designed to be flexible and understandable.
-  But this comes at the cost of convenience.
-  For example, if you want to use arguments instead of a config file mounted from a secret,
-  you can do so via editing the values file. But you'd have to make edits in multiple places.
-  You'd have to set `.Values.configMap.enabled` to `false`, add the arguments to `.Values.app.args`,
-  and remove the ConfigMap volumes from `.Values.volumes` and `.Values.volumeMounts`.
+### No Dependencies
+
+This chart does not bundle any databases (e.g., Postgres, Valkey) as a dependency.
+While this may seem inconvenient, it keeps the chart lightweight, and ensures users actively design their setup.
+Which database should be used? Is one already deployed? Should a new one be deployed? Is it deployed via helm chart or
+operator? Which helm chart should be used? Is a managed database service used?
+These are all questions that should be answered by the user, not the chart.
+
+### No Network Policies
+
+This chart does not contain templates for K8s objects like `NetworkPolicy`.
+While network policies are important for securing workloads,
+they are highly dependent on the specific cluster setup and requirements.
+It's the users responsibility to define and manage network policies that fit their needs.
 
 ## Getting Started
 
@@ -63,11 +73,10 @@ helm install copyparty oci://ghcr.io/ernail/charts/copyparty \
 ```
 
 All configuration options are documented in the [`values.yaml`](./chart/values.yaml).
-
-### Key Configuration Options
-
 An example config is available in the [`values.yaml`](./chart/values.yaml).
 Example deployments are available in the [`examples`](./examples) directory.
+
+### Key Configuration Options
 
 #### Copyparty Configuration
 
@@ -99,7 +108,8 @@ Other important configuration options that should be reviewed are:
 
 - `ingress` - The ingress configuration
 - `resources` - The resource requests and limits
-- `persistence` - The persistence configuration
+- `metrics` - The metrics configuration
+- `volumeConfigs` - The volume and persistence settings
 
 ## Contributing
 
