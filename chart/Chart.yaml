@@ -21,4 +21,4 @@ annotations:
       url: https://github.com/erNail/copyparty-chart/issues
 version: "0.0.0"
 # renovate: image=copyparty/ac
-appVersion: "1.19.20"
+appVersion: "1.20.1"
