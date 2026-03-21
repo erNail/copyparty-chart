@@ -1,0 +1,182 @@
+---
+suite: "httproute template"
+templates:
+  - "httproute.yaml"
+tests:
+  - it: "should not render httproute if disabled"
+    set:
+      httproute:
+        enabled: false
+    asserts:
+      - notExists:
+          path: "spec"
+
+  - it: "should render httproute if enabled"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - isKind:
+          of: "HTTPRoute"
+
+  - it: "should render apiVersion with default value"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - equal:
+          path: "apiVersion"
+          value: "gateway.networking.k8s.io/v1"
+
+  - it: "should render apiVersion as set"
+    set:
+      httproute:
+        enabled: true
+      apiVersions:
+        httproute: "gateway.networking.k8s.io/v1beta1"
+    asserts:
+      - equal:
+          path: "apiVersion"
+          value: "gateway.networking.k8s.io/v1beta1"
+
+  - it: "should not render annotations if not set"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - notExists:
+          path: "metadata.annotations"
+
+  - it: "should render annotations as set"
+    set:
+      httproute:
+        enabled: true
+        annotations:
+          some-annotation: "123"
+    asserts:
+      - equal:
+          path: "metadata.annotations"
+          value:
+            some-annotation: "123"
+
+  - it: "should render parentRefs with default value"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - equal:
+          path: "spec.parentRefs"
+          value:
+            - group: "gateway.networking.k8s.io"
+              kind: "Gateway"
+              name: "example"
+              namespace: "example"
+              sectionName: "example"
+
+  - it: "should render parentRefs as set"
+    set:
+      httproute:
+        enabled: true
+        parentRefs:
+          - group: "gateway.networking.k8s.io"
+            kind: "Gateway"
+            name: "another-example"
+            namespace: "another-example"
+            sectionName: "another-example"
+    asserts:
+      - equal:
+          path: "spec.parentRefs"
+          value:
+            - group: "gateway.networking.k8s.io"
+              kind: "Gateway"
+              name: "another-example"
+              namespace: "another-example"
+              sectionName: "another-example"
+
+  - it: "should render hostnames with default value"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - equal:
+          path: "spec.hostnames"
+          value: [ "copyparty.example.com" ]
+
+  - it: "should render hostnames as set"
+    set:
+      httproute:
+        enabled: true
+        hostnames: [ "copyparty.example" ]
+    asserts:
+      - equal:
+          path: "spec.hostnames"
+          value: [ "copyparty.example" ]
+
+  - it: "should render rules with default value"
+    release:
+      name: "copyparty"
+    set:
+      httproute:
+        enabled: true
+    asserts:
+      - equal:
+          path: "spec.rules"
+          value:
+            - matches:
+                - path:
+                    type: "PathPrefix"
+                    value: "/"
+              filters: []
+              backendRefs:
+                - group: ""
+                  kind: "Service"
+                  name: "copyparty"
+                  port: 80
+                  weight: 1
+              timeouts: {request: "0s", backendRequest: "0s"}
+
+  - it: "should render rules as set"
+    release:
+      name: "copyparty"
+    set:
+      httproute:
+        enabled: true
+        rules:
+          - matches:
+              - path:
+                  type: "PathPrefix"
+                  value: "/example"
+            filters:
+              - type: "RequestHeaderModifier"
+                requestHeaderModifier:
+                  add:
+                    - name: "my-header"
+                      value: "foo"
+            timeouts:
+              request: "10s"
+              backendRequest: "2s"
+            servicePort: 123
+            weight: 123
+    asserts:
+      - equal:
+          path: "spec.rules"
+          value:
+            - matches:
+                - path:
+                    type: "PathPrefix"
+                    value: "/example"
+              filters:
+                - type: "RequestHeaderModifier"
+                  requestHeaderModifier:
+                    add:
+                      - name: "my-header"
+                        value: "foo"
+              timeouts:
+                request: "10s"
+                backendRequest: "2s"
+              backendRefs:
+                - group: ""
+                  kind: "Service"
+                  name: "copyparty"
+                  port: 123
+                  weight: 123

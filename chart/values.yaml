@@ -6,6 +6,7 @@ apiVersions:
   deployment: "apps/v1"
   horizontalPodAutoscaler: "autoscaling/v2"
   ingress: "networking.k8s.io/v1"
+  httproute: "gateway.networking.k8s.io/v1"
   persistentVolumeClaim: "v1"
   podDisruptionBudget: "policy/v1"
   service: "v1"
@@ -395,6 +396,46 @@ ingress:
     - hosts:
         - "copyparty.example.com"
       secretName: "app-tls"
+
+# -- HTTPRoute configuration.
+#
+# Ref: https://gateway-api.sigs.k8s.io/api-types/httproute/
+httproute:
+  # -- Whether to create an HTTPRoute resource.
+  enabled: false
+  # -- Annotations to add to the HTTPRoute.
+  annotations: {}
+  # -- Gateway to use
+  parentRefs:
+    - group: "gateway.networking.k8s.io"
+      kind: "Gateway"
+      name: "example"
+      namespace: "example"
+      sectionName: "example"
+  # -- HTTPRoute hostnames
+  hostnames:
+    - "copyparty.example.com"
+  # -- Rules to match traffic on.
+  #
+  # Ref: https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule
+  rules:
+    # -- HTTPRoute matches
+    - matches:
+        - path:
+            type: "PathPrefix"
+            value: "/"
+      # -- HTTPRoute filters
+      filters: []
+      # -- HTTPRoute timeouts
+      # Default is to disable timeouts, so that up/downloads dont get interrupted.
+      timeouts:
+        request: 0s
+        backendRequest: 0s
+      # -- HTTPRoute backendRef service port
+      # This should reference the service ports defined at `.Values.service.ports`.
+      servicePort: 80
+      # -- HTTPRoute backendRef weight
+      weight: 1
 
 # -- Pod Disruption Budget configuration.
 #

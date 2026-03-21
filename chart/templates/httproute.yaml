@@ -1,0 +1,29 @@
+{{- if .Values.httproute.enabled -}}
+---
+kind: "HTTPRoute"
+apiVersion: {{ .Values.apiVersions.httproute | quote }}
+metadata:
+  name: {{ include "names.fullname" . | quote }}
+  namespace: {{ include "names.namespace" . | quote }}
+  labels:
+    {{- include "labels.commonLabels" . | nindent 4 }}
+  {{- with .Values.httproute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  hostnames: {{- toYaml .Values.httproute.hostnames | nindent 4 }}
+  parentRefs: {{- toYaml .Values.httproute.parentRefs | nindent 4 }}
+  rules:
+    {{- range .Values.httproute.rules }}
+    - matches: {{- toYaml .matches | nindent 10 }}
+      filters: {{- toYaml .filters | nindent 10 }}
+      timeouts: {{- toYaml .timeouts | nindent 10 }}
+      backendRefs:
+        - group: ""
+          kind: "Service"
+          name: {{ include "names.fullname" $ | quote }}
+          port: {{ .servicePort }}
+          weight: {{ .weight }}
+    {{- end }}
+{{- end }}
