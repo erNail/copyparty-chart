@@ -40,7 +40,7 @@ It's the users responsibility to define and manage network policies that fit the
 
 ### Deploy the Helm Chart
 
-If the default values in the [`values.yaml`](./values.yaml) fit your needs,
+If the default values in the [`values.yaml`](./chart/values.yaml) fit your needs,
 you can deploy the helm chart using this command:
 
 ```shell
@@ -53,7 +53,7 @@ helm install copyparty oci://ghcr.io/ernail/charts/copyparty \
 
 Helm provides different ways to [configure helm charts via values](https://helm.sh/docs/helm/helm_install/#synopsis).
 A common way is to create your own values file,
-which overrides values of the charts default [`values.yaml`](./values.yaml):
+which overrides values of the charts default [`values.yaml`](./chart/values.yaml):
 
 ```shell
 helm install copyparty oci://ghcr.io/ernail/charts/copyparty \

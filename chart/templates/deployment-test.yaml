@@ -206,22 +206,43 @@ tests:
           path: "spec.template.spec.containers[0].securityContext"
           value:
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
             runAsGroup: 10001
             runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: "RuntimeDefault"
 
   - it: "should render container securityContext as set"
     set:
       containerSecurityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
         readOnlyRootFilesystem: false
+        runAsNonRoot: false
+        runAsGroup: 1000
+        runAsUser: 1000
+        allowPrivilegeEscalation: true
+        capabilities:
+          drop:
+            - "CAP_CHOWN"
+        seccompProfile:
+          type: "Unconfined"
     asserts:
       - equal:
           path: "spec.template.spec.containers[0].securityContext"
           value:
-            runAsUser: 1000
-            runAsGroup: 1000
             readOnlyRootFilesystem: false
+            runAsNonRoot: false
+            runAsGroup: 1000
+            runAsUser: 1000
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+                - "CAP_CHOWN"
+            seccompProfile:
+              type: "Unconfined"
 
   - it: "should render image with default value"
     chart:
@@ -264,7 +285,7 @@ tests:
             - containerPort: 3923
               name: "http"
               protocol: "TCP"
-            - containerPort: 3923
+            - containerPort: 3000
               name: "metrics"
               protocol: "TCP"
 
@@ -410,8 +431,8 @@ tests:
             - emptyDir: {}
               name: "app-data"
             - name: "copyparty-config"
-              secret:
-                secretName: "copyparty-config"
+              configMap:
+                name: "copyparty-config"
             - emptyDir: {}
               name: "tmp"
             - emptyDir: {}
@@ -427,9 +448,8 @@ tests:
         foo:
           volume:
             name: "foo"
-            secret:
-              secretName: "mysecret"
-              optional: false
+            configMap:
+              name: "myconfigmap"
           persistence:
             enabled: false
             volume:
@@ -439,9 +459,8 @@ tests:
           path: "spec.template.spec.volumes"
           value:
             - name: "foo"
-              secret:
-                secretName: "mysecret"
-                optional: false
+              configMap:
+                name: "myconfigmap"
 
   - it: "should render persistence volumes with default value"
     set:
@@ -460,8 +479,8 @@ tests:
               persistentVolumeClaim:
                 claimName: "app-data"
             - name: "copyparty-config"
-              secret:
-                secretName: "copyparty-config"
+              configMap:
+                name: "copyparty-config"
             - emptyDir: {}
               name: "tmp"
             - name: "user-data"

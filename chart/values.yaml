@@ -82,6 +82,10 @@ podSecurityContext:
 # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 containerSecurityContext:
   readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities: { drop: ["ALL"] }
+  seccompProfile: { type: "RuntimeDefault" }
   runAsUser: 10001
   runAsGroup: 10001
 
@@ -241,8 +245,10 @@ volumeConfig:
     # -- Will be added to the pods `volumes`.
     volume:
       name: "copyparty-config"
-      secret:
-        secretName: "copyparty-config"
+      configMap:
+        name: "copyparty-config"
+      #secret:
+      #  secretName: "copyparty-config"
   tmp:
     # -- Will be added to the pods `volumeMounts`.
     volumeMount:
@@ -283,7 +289,7 @@ containerPorts:
     port: 3923
     protocol: "TCP"
   - name: "metrics"
-    port: 3923
+    port: 3000
     protocol: "TCP"
 
 # -- Service configuration.
