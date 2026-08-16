@@ -124,7 +124,7 @@ jobs:
   test-chart-job:
     runs-on: "ubuntu-24.04"
     container:
-      image: "alpine/helm:3.19.0@sha256:aef9b56f64e866207d9591d0abd8f6d767b36aadd12edf68f8a719716d9d29c9"
+      image: "alpine/helm:3.21.4@sha256:82c0ce1b4196539946ed01bdfd9345cf74ca999b95d3074ce3f2f5ea45c96e80"
     steps:
       - name: "Check out repository"
         uses: "actions/checkout@v6.0.0"
@@ -163,7 +163,7 @@ jobs:
   package-chart-job:
     runs-on: "ubuntu-24.04"
     container:
-      image: "alpine/helm:3.19.0@sha256:aef9b56f64e866207d9591d0abd8f6d767b36aadd12edf68f8a719716d9d29c9"
+      image: "alpine/helm:3.21.4@sha256:82c0ce1b4196539946ed01bdfd9345cf74ca999b95d3074ce3f2f5ea45c96e80"
     needs:
       - "determine-version-job"
     steps:
@@ -184,7 +184,7 @@ jobs:
   publish-chart-job:
     runs-on: "ubuntu-24.04"
     container:
-      image: "alpine/helm:3.19.0@sha256:aef9b56f64e866207d9591d0abd8f6d767b36aadd12edf68f8a719716d9d29c9"
+      image: "alpine/helm:3.21.4@sha256:82c0ce1b4196539946ed01bdfd9345cf74ca999b95d3074ce3f2f5ea45c96e80"
     permissions:
       packages: "write"
     needs:
